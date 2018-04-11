@@ -3,22 +3,21 @@ import argparse
 
 parser = argparse.ArgumentParser(
     description='Takes parallel penman graphs and removes entries in which '
-                'graphs could not be generated.')
+                'graphs could not be generated. Output format will be a '
+                'translation pair per line where the translations are '
+                'separated by a tab character.')
 parser.add_argument('input_lang1', type=str,
                     help='File for original graphs in 1st language.')
 parser.add_argument('input_lang2', type=str,
                     help='File for original graphs in 2st language.')
-parser.add_argument('output_lang1', type=str,
-                    help='Output file for graphs in 1st language.')
-parser.add_argument('output_lang2', type=str,
-                    help='Output file for graphs in 2st language.')
+parser.add_argument('output', type=str,
+                    help='Output file for the cleaned data.')
 args = parser.parse_args()
 
 
 with open(args.input_lang1, 'r') as eng_text, \
      open(args.input_lang2, 'r') as jpn_text, \
-     open(args.output_lang1, 'w') as eng_clean, \
-     open(args.output_lang2, 'w') as jpn_clean:
+     open(args.output, 'w') as output:
     eng_text = list(reversed(eng_text.readlines()))
     jpn_text = list(reversed(jpn_text.readlines()))
     while eng_text and jpn_text:
@@ -57,9 +56,6 @@ with open(args.input_lang1, 'r') as eng_text, \
         jpn_text.pop()
 
         if len(eng_parse) > 2 and len(jpn_parse) > 2:
-            eng_clean.write(''.join(eng_header))
-            eng_clean.write(' '.join(eng_parse))
-            eng_clean.write('\n\n')
-            jpn_clean.write(''.join(jpn_header))
-            jpn_clean.write(' '.join(jpn_parse))
-            jpn_clean.write('\n\n')
+            eng_graph = ' '.join(eng_parse)
+            jpn_graph = ' '.join(jpn_parse)
+            output.write(eng_graph + '\t' + jpn_graph + '\n')
