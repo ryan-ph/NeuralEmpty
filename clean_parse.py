@@ -14,6 +14,7 @@ parser.add_argument('output_lang2', type=str,
                     help='Output file for graphs in 2st language.')
 args = parser.parse_args()
 
+
 with open(args.input_lang1, 'r') as eng_text, \
      open(args.input_lang2, 'r') as jpn_text, \
      open(args.output_lang1, 'w') as eng_clean, \
