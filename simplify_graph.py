@@ -20,7 +20,7 @@ def simplify(graph, instance_nodes):
 def reverse(graph, instance_nodes):
     instance_nodes.sort(key=lambda x: -len(x))
     nodes = [node[1:] for node in instance_nodes]
-    nodes_to_nums = { node : i + 1 for i, node in enumerate(nodes) }
+    nodes_to_nums = { node : (i + 1) * 100 for i, node in enumerate(nodes) }
 
     # Renodes nodes
     for pattern, node in zip(instance_nodes, nodes):
