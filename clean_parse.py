@@ -1,4 +1,5 @@
 import argparse
+import re
 
 
 parser = argparse.ArgumentParser(
@@ -12,6 +13,9 @@ parser.add_argument('input_lang2', type=str,
                     help='File for original graphs in 2st language.')
 parser.add_argument('output', type=str,
                     help='Output file for the cleaned data.')
+parser.add_argument('--full', action='store_true',
+                    help='Keeps all features of the DMRS graph. Defaults to '
+                         'false.')
 args = parser.parse_args()
 
 
@@ -22,37 +26,75 @@ with open(args.input_lang1, 'r') as eng_text, \
     jpn_text = list(reversed(jpn_text.readlines()))
     while eng_text and jpn_text:
         eng_parse = []
-        eng_header = []
         while eng_text[-1].strip():
-            feat = eng_text.pop()
-            if feat.strip().startswith('#'):
-                eng_header.append(feat)
+            feat = eng_text.pop().strip()
+
+            # skip sentence id and sentence as well as concrete args
+            if feat.startswith('#') or feat.startswith(':carg'):
                 continue
-            else:
-                feat = feat.strip()
-            if not feat.strip().startswith(':lnk'):
+
+
+            # remove lines that have lnk while preserving closing brackets
+            if feat.startswith(':lnk'):
+
+                # append closing brackets to previous feature
+                if feat.endswith(')'):
+                    paren_index = feat.find(')')
+                    prev = eng_parse.pop()
+                    eng_parse.append(prev + feat[paren_index:])
+
+            # keep everything else if we need the full representation
+            elif args.full:
                 eng_parse.append(feat)
-            elif feat.endswith(')'):
-                paren_index = feat.find(')')
-                eng_parse.append(eng_parse.pop()[:-1]
-                                 + ' ' + feat[paren_index:])
+            else:
+
+                # if it a node
+                if re.match('(^\()|(^(:[A-Z]))', feat):
+                    eng_parse.append(feat)
+
+                # or has closing parens
+                elif feat.endswith(')'):
+                    paren_index = feat.find(')')
+                    prev = eng_parse.pop()
+                    eng_parse.append(prev + feat[paren_index:])
+
+        # pop off space separating graphs
         eng_text.pop()
 
         jpn_parse = []
-        jpn_header = []
         while jpn_text[-1].strip():
-            feat = jpn_text.pop()
-            if feat.strip().startswith('#'):
-                jpn_header.append(feat)
+            feat = jpn_text.pop().strip()
+
+            # skip sentence id and sentence as well as concrete args
+            if feat.startswith('#') or feat.startswith(':carg'):
                 continue
-            else:
-                feat = feat.strip()
-            if not feat.startswith(':lnk'):
+
+
+            # remove lines that have lnk while preserving closing brackets
+            if feat.startswith(':lnk'):
+
+                # append closing brackets to previous feature
+                if feat.endswith(')'):
+                    paren_index = feat.find(')')
+                    prev = jpn_parse.pop()
+                    jpn_parse.append(prev + feat[paren_index:])
+
+            # keep everything else if we need the full representation
+            elif args.full:
                 jpn_parse.append(feat)
-            elif feat.endswith(')'):
-                paren_index = feat.find(')')
-                jpn_parse.append(jpn_parse.pop()[:-1]
-                                 + ' ' + feat[paren_index:])
+            else:
+
+                # if it a node
+                if re.match('(^\()|(^(:[A-Z]))', feat):
+                    jpn_parse.append(feat)
+
+                # or has closing parens
+                elif feat.endswith(')'):
+                    paren_index = feat.find(')')
+                    prev = jpn_parse.pop()
+                    jpn_parse.append(prev + feat[paren_index:])
+
+        # remove blank line separating graphs
         jpn_text.pop()
 
         if len(eng_parse) > 2 and len(jpn_parse) > 2:
