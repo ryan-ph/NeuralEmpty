@@ -33,13 +33,16 @@ with open(args.input_lang1, 'r') as eng_text, \
             if feat.startswith('#') or feat.startswith(':carg'):
                 continue
 
+            # splits a part closing brackets
+            if feat.endswith(')'):
+                feat = feat.replace(')', ' )')
 
             # remove lines that have lnk while preserving closing brackets
             if feat.startswith(':lnk'):
 
                 # append closing brackets to previous feature
                 if feat.endswith(')'):
-                    paren_index = feat.find(')')
+                    paren_index = feat.find(' )')
                     prev = eng_parse.pop()
                     eng_parse.append(prev + feat[paren_index:])
 
@@ -54,7 +57,7 @@ with open(args.input_lang1, 'r') as eng_text, \
 
                 # or has closing parens
                 elif feat.endswith(')'):
-                    paren_index = feat.find(')')
+                    paren_index = feat.find(' )')
                     prev = eng_parse.pop()
                     eng_parse.append(prev + feat[paren_index:])
 
@@ -69,6 +72,9 @@ with open(args.input_lang1, 'r') as eng_text, \
             if feat.startswith('#') or feat.startswith(':carg'):
                 continue
 
+            # splits a part closing brackets
+            if feat.endswith(')'):
+                feat = feat.replace(')', ' )')
 
             # remove lines that have lnk while preserving closing brackets
             if feat.startswith(':lnk'):
