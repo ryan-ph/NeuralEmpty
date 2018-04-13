@@ -60,12 +60,8 @@ def main():
         lines = list(f.readlines())
 
         # Input should be in the format:
-        # #::id <num>
-        # #::snt <sentence>
-        # <graph>
-        # \n
-        for i in range(0, len(lines), 4):
-            graph = lines[i + 2]
+        # <graph> \n
+        for graph in lines:
 
             # Grabs all the original nodes
             instance_nodes = list(instance_nodes_pattern.findall(graph))
@@ -74,11 +70,7 @@ def main():
             else:
                 graph = reverse(graph, instance_nodes)
 
-            output.write(lines[i])
-            output.write(lines[i + 1])
             output.write(graph)
-            if i + 3 < len(lines):
-                output.write(lines[i + 3])
 
 
 if __name__ == '__main__':

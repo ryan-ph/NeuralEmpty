@@ -26,25 +26,33 @@ with open(args.input_lang1, 'r') as eng_text, \
     jpn_text = list(reversed(jpn_text.readlines()))
     while eng_text and jpn_text:
         eng_parse = []
-        while eng_text[-1].strip():
+        while eng_text and eng_text[-1].strip():
             feat = eng_text.pop().strip()
 
             # skip sentence id and sentence as well as concrete args
             if feat.startswith('#') or feat.startswith(':carg'):
                 continue
 
+            # separate opening paren from graph root
+            if feat.startswith('('):
+                feat = feat.replace('(', '( ')
+
+            # attach opening paren to node rather than label
+            elif '(' in feat:
+                feat = feat.replace(' (', '( ')
+
             # splits a part closing brackets
             if feat.endswith(')'):
-                feat = feat.replace(')', ' )')
+                feat = re.sub('\)', ' )', feat)
 
             # remove lines that have lnk while preserving closing brackets
             if feat.startswith(':lnk'):
 
                 # append closing brackets to previous feature
                 if feat.endswith(')'):
-                    paren_index = feat.find(' )')
+                    paren_index = feat.find('>"')
                     prev = eng_parse.pop()
-                    eng_parse.append(prev + feat[paren_index:])
+                    eng_parse.append(prev + feat[paren_index + 2:])
 
             # keep everything else if we need the full representation
             elif args.full:
@@ -62,28 +70,37 @@ with open(args.input_lang1, 'r') as eng_text, \
                     eng_parse.append(prev + feat[paren_index:])
 
         # pop off space separating graphs
-        eng_text.pop()
+        if eng_text:
+            eng_text.pop()
 
         jpn_parse = []
-        while jpn_text[-1].strip():
+        while jpn_text and jpn_text[-1].strip():
             feat = jpn_text.pop().strip()
 
             # skip sentence id and sentence as well as concrete args
             if feat.startswith('#') or feat.startswith(':carg'):
                 continue
 
+            # separate opening paren from graph root
+            if feat.startswith('('):
+                feat = feat.replace('(', '( ')
+
+            # attach opening paren to node rather than label
+            elif '(' in feat:
+                feat = feat.replace(' (', '( ')
+
             # splits a part closing brackets
             if feat.endswith(')'):
-                feat = feat.replace(')', ' )')
+                feat = re.sub('\)', ' )', feat)
 
             # remove lines that have lnk while preserving closing brackets
             if feat.startswith(':lnk'):
 
                 # append closing brackets to previous feature
                 if feat.endswith(')'):
-                    paren_index = feat.find(')')
+                    paren_index = feat.find('>"')
                     prev = jpn_parse.pop()
-                    jpn_parse.append(prev + feat[paren_index:])
+                    jpn_parse.append(prev + feat[paren_index + 2:])
 
             # keep everything else if we need the full representation
             elif args.full:
@@ -96,12 +113,13 @@ with open(args.input_lang1, 'r') as eng_text, \
 
                 # or has closing parens
                 elif feat.endswith(')'):
-                    paren_index = feat.find(')')
+                    paren_index = feat.find(' )')
                     prev = jpn_parse.pop()
                     jpn_parse.append(prev + feat[paren_index:])
 
-        # remove blank line separating graphs
-        jpn_text.pop()
+        # pop off space separating graphs
+        if jpn_text:
+            jpn_text.pop()
 
         if len(eng_parse) > 2 and len(jpn_parse) > 2:
             eng_graph = ' '.join(eng_parse)
