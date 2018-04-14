@@ -44,7 +44,18 @@ def reverse(graph, instance_nodes):
     return graph
 
 
-def expand(graph, features):
+def expand(graph):
+
+    # Handle inter feat separation
+    graph = re.sub('=', ' ', graph)
+
+    # Handle intra feat separation
+    intra_feature_pattern = re.compile('[\w-]:')
+    intra_feats = set(intra_feature_pattern.findall(graph))
+    for feat in intra_feats:
+        repl = ' '.join(list(feat))
+        graph = re.sub(feat, repl, graph)
+
     return graph
 
 
@@ -78,7 +89,6 @@ def squash(graph, features):
 
 
 def find_features(graph, nodes):
-
     features = []
 
     # Grabs all features from text except for last set of features
@@ -159,11 +169,11 @@ def main():
                     graph = reverse(graph, instance_nodes)
 
                 #  Handle features
-                all_nodes = list(all_nodes_pattern.finditer(graph))
-                features = find_features(graph, all_nodes)
                 if args.feature_type == 'expand':
-                    graph = expand(graph, features)
+                    graph = expand(graph)
                 elif args.feature_type == 'squash':
+                    all_nodes = list(all_nodes_pattern.finditer(graph))
+                    features = find_features(graph, all_nodes)
                     graph = squash(graph, features)
 
                 graphs[i] = graph
