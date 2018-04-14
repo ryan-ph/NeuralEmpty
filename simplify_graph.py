@@ -1,6 +1,10 @@
 import argparse
 import re
 from collections import Counter
+from tqdm import tqdm
+
+
+global_graph = ""
 
 
 def simplify(graph, instance_nodes):
@@ -8,9 +12,10 @@ def simplify(graph, instance_nodes):
     for node in instance_nodes:
         num, _, string = node.split()
         node_to_string[num] = string
-        graph = re.sub(node, string, graph)
+        graph = re.sub(re.escape(node), string, graph)
 
-    # Maps reentrancies to the original label appended with the string ' *'
+    # Maps reentrancies to the original label with reentrancy marker, <*>,
+    # preppended
     for node in node_to_string:
         graph = re.sub(node, '<*> ' + node_to_string[node], graph)
 
@@ -82,8 +87,7 @@ def squash(graph, features):
         inter_repl = re.sub(' ', '=', inter)
         feature_repl = re.sub(inter, inter_repl, feature_repl, count=1)
 
-        # Now replace the feature in the graph with the squashed feat
-        graph = re.sub(feature, feature_repl, graph, count=1)
+        graph = re.sub(re.escape(feature), feature_repl, graph, count=1)
 
     return graph
 
@@ -134,23 +138,20 @@ def main():
     args = parser.parse_args()
 
     if args.reverse:
-        '''
-        Regex for matching both instance and re-entrant nodes:
-        ((:[\w-]*)?\( [\w]*)|((:[\w-]*) <\*> [\w]*)
-        '''
-        instance_nodes_pattern = re.compile('((:[\w-]*)?\( \w+)')
+        instance_nodes_pattern = re.compile('((:[\w-]*)?\( [\w+]+)')
     else:
-        instance_nodes_pattern = re.compile('\d{5} /\ \w*')
+        instance_nodes_pattern = re.compile('\d{5} /\ [\w+]+')
 
-    all_nodes_pattern = re.compile('((:[\w-]*)?((\()|( <\*>)) \w+( / \w*)?)')
+    all_nodes_pattern = re.compile('((:[\w-]*)?((\()|( <\*>)) [\w+]+( / [\w+]+)?)')
 
     with open(args.input, 'r') as f, open(args.output, 'w') as output:
         lines = list(f.readlines())
 
         # Input should be in the format:
         # <original graph> \t <translation graph> \n
-        for graphs in lines:
+        for graphs in tqdm(lines):
             graphs = graphs.split('\t')
+
             for i in range(len(graphs)):
                 graph = graphs[i]
 
