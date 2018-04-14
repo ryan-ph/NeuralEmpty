@@ -49,6 +49,31 @@ def expand(graph, features):
 
 
 def squash(graph, features):
+    inter_feature_pattern = re.compile('\w [\w-]')
+    intra_feature_pattern = re.compile('[\w-] :')
+
+    for i in range(len(features)):
+        feature = features[i]
+        feature_repl = feature
+
+        # Find all instances we are looking to replace
+        inter_feats = inter_feature_pattern.findall(feature)
+        intra_feats = intra_feature_pattern.findall(feature)
+
+        for intra, inter in zip(intra_feats, inter_feats):
+            intra_repl = re.sub(' ', '', intra)
+            inter_repl = re.sub(' ', '=', inter)
+            feature_repl = re.sub(intra, intra_repl, feature_repl, count=1)
+            feature_repl = re.sub(inter, inter_repl, feature_repl, count=1)
+
+        # Handle fencepost since inter_feats has 1 extra element
+        inter = inter_feats[-1]
+        inter_repl = re.sub(' ', '=', inter)
+        feature_repl = re.sub(inter, inter_repl, feature_repl, count=1)
+
+        # Now replace the feature in the graph with the squashed feat
+        graph = re.sub(feature, feature_repl, graph, count=1)
+
     return graph
 
 
@@ -65,12 +90,16 @@ def find_features(graph, nodes):
             features.append(span)
 
     # Handles fencepost feature:
-    last_seg = graph[matches[-1].end():]
+    last_seg = graph[nodes[-1].end():]
 
     # Note: This last segment must contain a closing paren since we assume that
     # the graph is well-formed
     paren_index = last_seg.find(')')
-    features.append(last_seg[:paren_index])
+    span = last_seg[:paren_index]
+
+    # Only adds the last span if it is a feature and not just ' '
+    if span.strip():
+        features.append(span)
 
     return features
 
@@ -130,11 +159,11 @@ def main():
                     graph = reverse(graph, instance_nodes)
 
                 #  Handle features
-                all_nodes = list(all_nodes_pattern.findall(graph))
+                all_nodes = list(all_nodes_pattern.finditer(graph))
                 features = find_features(graph, all_nodes)
-                if args.expand:
+                if args.feature_type == 'expand':
                     graph = expand(graph, features)
-                elif args.squash:
+                elif args.feature_type == 'squash':
                     graph = squash(graph, features)
 
                 graphs[i] = graph
