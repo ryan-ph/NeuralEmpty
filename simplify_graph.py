@@ -3,9 +3,6 @@ import re
 from collections import Counter
 
 
-'''((:[\w-]*)?(\( \d* / \w*))|(:[A-Z-]* [\d]+)'''
-
-
 def simplify(graph, instance_nodes):
     node_to_string = {}
     for node in instance_nodes:
@@ -47,6 +44,37 @@ def reverse(graph, instance_nodes):
     return graph
 
 
+def expand(graph, features):
+    return graph
+
+
+def squash(graph, features):
+    return graph
+
+
+def find_features(graph, nodes):
+
+    features = []
+
+    # Grabs all features from text except for last set of features
+    for i in range(1, len(nodes), 1):
+        start = nodes[i - 1].end()
+        end = nodes[i].start()
+        span = graph[start:end]
+        if span.strip().startswith(':'):
+            features.append(span)
+
+    # Handles fencepost feature:
+    last_seg = graph[matches[-1].end():]
+
+    # Note: This last segment must contain a closing paren since we assume that
+    # the graph is well-formed
+    paren_index = last_seg.find(')')
+    features.append(last_seg[:paren_index])
+
+    return features
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Takes penman graphs and simplifies it for Neural '
@@ -75,6 +103,7 @@ def main():
     else:
         instance_nodes_pattern = re.compile('\d{5} /\ \w*')
 
+    all_nodes_pattern = re.compile('((:[\w-]*)?((\()|( <\*>)) \w+( / \w*)?)')
 
     with open(args.input, 'r') as f, open(args.output, 'w') as output:
         lines = list(f.readlines())
@@ -82,27 +111,35 @@ def main():
         # Input should be in the format:
         # <original graph> \t <translation graph> \n
         for graphs in lines:
-            eng_graph, jpn_graph = graphs.split('\t')
+            graphs = graphs.split('\t')
+            for i in range(len(graphs)):
+                graph = graphs[i]
 
-            # Grabs all the original nodes
-            eng_instance_nodes = list(instance_nodes_pattern.findall(eng_graph))
-            jpn_instance_nodes = list(instance_nodes_pattern.findall(jpn_graph))
+                # Grabs all instance nodes
+                instance_nodes = list(instance_nodes_pattern.findall(graph))
 
-            # Only care about first match - for some reason, reverse option
-            # will cause multiple matches
-            if args.reverse:
-                eng_instance_nodes = [node[0] for node in eng_instance_nodes]
-                jpn_instance_nodes = [node[0] for node in jpn_instance_nodes]
+                # Only care about first match - for some reason, reverse option
+                # will cause multiple matches
+                if args.reverse:
+                    instance_nodes = [node[0] for node in instance_nodes]
 
-            # Removes or adds node labels depending on flags
-            if not args.reverse:
-                eng_graph = simplify(eng_graph, eng_instance_nodes)
-                jpn_graph = simplify(jpn_graph, jpn_instance_nodes)
-            else:
-                eng_graph = reverse(eng_graph, eng_instance_nodes)
-                jpn_graph = reverse(jpn_graph, jpn_instance_nodes)
+                # Removes or adds node labels depending on flags
+                if not args.reverse:
+                    graph = simplify(graph, instance_nodes)
+                else:
+                    graph = reverse(graph, instance_nodes)
 
-            output.write(eng_graph + '\t' + jpn_graph)
+                #  Handle features
+                all_nodes = list(all_nodes_pattern.findall(graph))
+                features = find_features(graph, all_nodes)
+                if args.expand:
+                    graph = expand(graph, features)
+                elif args.squash:
+                    graph = squash(graph, features)
+
+                graphs[i] = graph
+
+            output.write('\t'.join(graphs))
 
 
 if __name__ == '__main__':
