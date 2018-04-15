@@ -121,7 +121,7 @@ with open(args.input_lang1, 'r') as eng_text, \
         if jpn_text:
             jpn_text.pop()
 
-        if len(eng_parse) > 2 and len(jpn_parse) > 2:
+        if len(eng_parse) > 1 and len(jpn_parse) > 1:
             eng_graph = ' '.join(eng_parse)
             jpn_graph = ' '.join(jpn_parse)
             output.write(eng_graph + '\t' + jpn_graph + '\n')
