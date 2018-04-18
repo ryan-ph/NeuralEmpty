@@ -16,23 +16,23 @@
         "source_token_indexers": {"tokens": {"namespace": "source_tokens"}},
         "target_token_indexers": {"tokens": {"namespace": "target_tokens"}}
     },
-    "train_data_path": "data/tanaka/simplified/featureless/tanaka-train.txt",
-    "validation_data_path": "data/tanaka/simplified/featureless/tanaka-dev.txt",
+    "train_data_path": "data/tanaka/simplified/featureless/train.txt",
+    "validation_data_path": "data/tanaka/simplified/featureless/dev.txt",
     "model": {
         "type": "simple_seq2seq",
         "source_embedder": {
             "tokens": {
                 "type": "embedding",
                 "vocab_namespace": "source_tokens",
-                "embedding_dim": 512,
+                "embedding_dim": 256,
                 "trainable": true
             }
         },
         "encoder": {
             "type": "lstm",
-            "input_size": 512,
+            "input_size": 256,
             "hidden_size": 256,
-            "num_layers": 2,
+            "num_layers": 3,
             "dropout": 0.15,
             "bidirectional": true
         },
@@ -47,12 +47,20 @@
         "sorting_keys": [["source_tokens", "num_tokens"]]
     },
     "trainer": {
-        "num_epochs": 20,
+        "num_epochs": 25,
         "patience": 5,
-        "cuda_device": -1,
+        "cuda_device": 0,
+        "validation_metric": "-loss",
+        "grad_clipping": 5.0,
+        "learning_rate_scheduler": {
+            "type": "reduce_on_plateau",
+            "factor": 0.5,
+            "mode": "min",
+            "patience": 2
+        },
         "optimizer": {
             "type": "adam",
-            "lr": 0.01
+            "lr": 0.0005
         }
     }
 }
