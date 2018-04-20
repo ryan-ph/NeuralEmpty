@@ -31,13 +31,18 @@ def reverse(graph, instance_nodes):
                                               key=lambda x: -len(x[1][1])))
 
     # Number labels
-    nodes_to_nums = { node[1] : (i + 1) * 100
+    nodes_to_nums = { node[1] : (i + 1) * 1000
                       for i, node in enumerate(split_nodes) }
 
-    # Renodes nodes
-    for pattern, (arg, label) in zip(instance_nodes, split_nodes):
-        repl = ' '.join([arg, str(nodes_to_nums[label]), '/', label])
-        graph = re.sub(re.escape(pattern), repl, graph)
+    # Renodes nodes:
+    #     Special case since there can be multiple udef_q that are not
+    #     reentrant
+    for i, (pattern, (arg, label)) in enumerate(zip(instance_nodes, split_nodes)):
+        val = nodes_to_nums[label]
+        if 'udef_q' in label:
+            val += i * 10
+        repl = ' '.join([arg, str(val), '/', label])
+        graph = re.sub(re.escape(pattern), repl, graph, count=1)
 
     reentrancies = re.findall('<\*> \w+', graph)
     reentrancies.sort(key=lambda x: -len(x))
