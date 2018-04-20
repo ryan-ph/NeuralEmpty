@@ -131,7 +131,7 @@ def main():
                         help='Input file.')
     parser.add_argument('output', type=str,
                         help='Output file.')
-    parser.add_argument('--reverse', action='store_true',
+    parser.add_argument('--reverse', action='store_true', default=False,
                         help='Recovers a DMRS graph given the simplified version.')
     parser.add_argument('--feature-type', type=str, default='stable',
                         choices=['squash', 'expand', 'stable'],
@@ -142,12 +142,8 @@ def main():
                              'of the features. (default="stable")')
     args = parser.parse_args()
 
-    if args.reverse:
-        instance_nodes_pattern = re.compile('((:[\w-]*)?\( [\w+]+)')
-    else:
-        instance_nodes_pattern = re.compile('\d{5} /\ [\w+]+')
-
-    all_nodes_pattern = re.compile('((:[\w-]*)?((\()|( <\*>)) [\w+]+( / [\w+]+)?)')
+    instance_nodes_pattern = get_instance_node_pattern(args.reverse)
+    all_nodes_pattern = get_all_nodes_pattern()
 
     with open(args.input, 'r') as f, open(args.output, 'w') as output:
         lines = list(f.readlines())
@@ -185,6 +181,17 @@ def main():
                 graphs[i] = graph
 
             output.write('\t'.join(graphs))
+
+
+def get_all_nodes_pattern():
+    return re.compile('((:[\w-]*)?((\()|( <\*>)) [\w+]+( / [\w+]+)?)')
+
+
+def get_instance_node_pattern(reverse=False):
+    if reverse:
+        return re.compile('((:[\w-]*)?\( [\w+]+)')
+    else:
+        return re.compile('\d{5} /\ [\w+]+')
 
 
 if __name__ == '__main__':
