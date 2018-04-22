@@ -35,14 +35,17 @@ def reverse(graph, instance_nodes):
                       for i, node in enumerate(split_nodes) }
 
     # Renodes nodes:
-    #     Special case since there can be multiple udef_q that are not
-    #     reentrant
+    #     Special case since there can be multiple nodes with the same label
+    #     that are not reentrant (i.e udef_q or nominalizer are some labels
+    #     that appear commonly)
+    seen = set()
     for i, (pattern, (arg, label)) in enumerate(zip(instance_nodes, split_nodes)):
         val = nodes_to_nums[label]
-        if 'udef_q' in label:
+        if label in seen:
             val += i * 10
         repl = ' '.join([arg, str(val), '/', label])
         graph = re.sub(re.escape(pattern), repl, graph, count=1)
+        seen.add(label)
 
     reentrancies = re.findall('<\*> \w+', graph)
     reentrancies.sort(key=lambda x: -len(x))
