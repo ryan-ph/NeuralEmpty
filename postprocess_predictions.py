@@ -26,7 +26,7 @@ instance_nodes_pattern = get_instance_node_pattern(reverse=True)
 all_nodes_pattern = get_all_nodes_pattern()
 
 with open(args.output, 'w') as output:
-    for i, pred in tqdm(enumerate(predictions)):
+    for i, pred in enumerate(tqdm(predictions)):
 
         # Adds node labels
         instance_nodes = [node[0] for node

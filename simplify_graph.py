@@ -53,9 +53,9 @@ def reverse(graph, instance_nodes):
         # If the node is not in the nodes_to_nums dict, the graph is not
         # well-formed (i.e. some node is considered reentrant despite not
         # appearing in the graph before). This case only occurs from model
-        # predictions. In this case, we return an empty graph.
+        # predictions. In this case, we return an invalid graph.
         if node not in nodes_to_nums:
-            return '(999999999 / invalid)'
+            return '(999999999 / invalid)\n'
         else:
             graph = re.sub(reentrance, str(nodes_to_nums[node]), graph)
 
