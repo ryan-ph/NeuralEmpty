@@ -1,3 +1,6 @@
 [submodule "opennmt"]
 	path = opennmt
 	url = https://github.com/ryanp97/OpenNMT-py
+[submodule "smatch"]
+	path = smatch
+	url = https://github.com/ryanp97/smatch
