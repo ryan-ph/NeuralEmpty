@@ -23,13 +23,17 @@ def simplify(graph, instance_nodes):
 
 
 def check_parens(graph):
-    graph = re.sub('[/\t \w:-]', '', graph)
+    """
+    Should return True if the graph paren structure is well-formed.
+    """
+
+    graph = re.sub('[/\t \+\w:-](<\*>)?', '', graph.strip())
     s = []
     for char in graph:
         if char == '(':
             s.append(char)
         elif not s:
-            return True
+            return False
         else:
             s.pop()
     return not s
@@ -96,8 +100,8 @@ def expand(graph):
 
 
 def squash(graph, features):
-    inter_feature_pattern = re.compile('\w [\w-]')
-    intra_feature_pattern = re.compile('[\w-] :')
+    inter_feature_pattern = re.compile('\w [\+\w-]')
+    intra_feature_pattern = re.compile('[\+\w-] :')
 
     for i in range(len(features)):
         feature = features[i]
@@ -110,8 +114,8 @@ def squash(graph, features):
         for intra, inter in zip(intra_feats, inter_feats):
             intra_repl = re.sub(' ', '', intra)
             inter_repl = re.sub(' ', '=', inter)
-            feature_repl = re.sub(intra, intra_repl, feature_repl, count=1)
-            feature_repl = re.sub(inter, inter_repl, feature_repl, count=1)
+            feature_repl = re.sub(re.escape(intra), intra_repl, feature_repl, count=1)
+            feature_repl = re.sub(re.escape(inter), inter_repl, feature_repl, count=1)
 
         # Handle fencepost since inter_feats has 1 extra element
         inter = inter_feats[-1]
