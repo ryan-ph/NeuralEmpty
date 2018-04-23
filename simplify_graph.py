@@ -22,7 +22,22 @@ def simplify(graph, instance_nodes):
     return graph
 
 
+def check_parens(graph):
+    graph = re.sub('[/\t \w:-]', '', graph)
+    s = []
+    for char in graph:
+        if char == '(':
+            s.append(char)
+        elif not s:
+            return True
+        else:
+            s.pop()
+    return not s
+
+
 def reverse(graph, instance_nodes):
+    if not check_parens(graph):
+        return '(999999999 / invalid)\n'
 
     # Split nodes into argument and then node label and sorts so longest node
     # label is first
