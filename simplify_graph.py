@@ -27,7 +27,7 @@ def check_parens(graph):
     Should return True if the graph paren structure is well-formed.
     """
 
-    graph = re.sub('[/\t \+\w:-](<\*>)?', '', graph.strip())
+    graph = re.sub('[/\t \+\w:=-](<\*>)?', '', graph.strip())
     s = []
     for char in graph:
         if char == '(':
@@ -99,6 +99,30 @@ def expand(graph):
     return graph
 
 
+def filter_feats(graph, features_to_keep=[]):
+    if not features_to_keep:
+        return graph
+
+    inclusion_pattern = re.compile(
+        ':({})\ [\w+-]+'.format('|'.join(features_to_keep))
+    )
+
+    all_nodes = list(get_all_nodes_pattern().finditer(graph))
+    features = find_features(graph, all_nodes)
+
+    for feature in features:
+
+        # removes any of the features that we don't want to keep
+        cleaned_feat = ' '.join(feature[x.start(): x.end()] for x in
+                                inclusion_pattern.finditer(feature))
+        graph = re.sub(re.escape(feature.strip()), cleaned_feat, graph, count=1)
+
+    # Replaces '  ' with ' ' for consistency
+    graph = re.sub('  ', ' ', graph)
+
+    return graph
+
+
 def squash(graph, features):
     inter_feature_pattern = re.compile('\w [\+\w-]')
     intra_feature_pattern = re.compile('[\+\w-] :')
@@ -130,27 +154,31 @@ def squash(graph, features):
 def find_features(graph, nodes):
     features = []
 
+    if not nodes:
+        return features
+
     # Grabs all features from text except for last set of features
     for i in range(1, len(nodes), 1):
         start = nodes[i - 1].end()
         end = nodes[i].start()
-        span = graph[start:end]
+        span = remove_closing_parens(graph[start:end])
         if span.strip().startswith(':'):
             features.append(span)
 
     # Handles fencepost feature:
-    last_seg = graph[nodes[-1].end():]
-
-    # Note: This last segment must contain a closing paren since we assume that
-    # the graph is well-formed
-    paren_index = last_seg.find(')')
-    span = last_seg[:paren_index]
+    last_seg = remove_closing_parens(graph[nodes[-1].end():])
 
     # Only adds the last span if it is a feature and not just ' '
     if span.strip():
         features.append(span)
 
     return features
+
+
+def remove_closing_parens(string):
+    if ')' in string:
+        string = string[:string.find(')')]
+    return string
 
 
 def main():
