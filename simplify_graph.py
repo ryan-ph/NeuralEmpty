@@ -166,7 +166,7 @@ def find_features(graph, nodes):
             features.append(span)
 
     # Handles fencepost feature:
-    last_seg = remove_closing_parens(graph[nodes[-1].end():])
+    span = remove_closing_parens(graph[nodes[-1].end():])
 
     # Only adds the last span if it is a feature and not just ' '
     if span.strip():
