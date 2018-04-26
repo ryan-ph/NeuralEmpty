@@ -49,16 +49,23 @@ model outputs. Note that any non-well-formed graphs will be replaced with
 `(999999999 / invalid)`. This will eventually underestimate how well the model
 performs since it will result in the invalid graph having a F1 score of 0.
 
+Use the `--include-features` flag to filter out any unwanted features for
+evaluation.
+
 ```
-usage: postprocess_predictions.py [-h] input output
+usage: postprocess_predictions.py [-h]
+                                  [--include-features INCLUDE_FEATURES [INCLUDE_FEATURES ...]]
+                                  input output
 
 Takes predicted file and converts it into a format that can be evaluated using
 SMATCH.
 
 positional arguments:
-  input       Input file.
-  output      Output file.
+  input                 Input file.
+  output                Output file.
 
 optional arguments:
-  -h, --help  show this help message and exit
+  -h, --help            show this help message and exit
+  --include-features INCLUDE_FEATURES [INCLUDE_FEATURES ...]
+                        Features to include separated by spaces.
 ```
