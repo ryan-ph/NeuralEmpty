@@ -17,6 +17,8 @@ def main():
                         help='Input file.')
     parser.add_argument('output', type=str,
                         help='Output file.')
+    parser.add_argument('--remove-all-features', action='store_true',
+                        help='Removes all features.')
     parser.add_argument('--include-features', nargs='+', default=[],
                         help='Features to include separated by spaces.')
     args = parser.parse_args()
@@ -40,7 +42,8 @@ def main():
             pred = expand(pred)
 
             # Filtering features
-            pred = filter_feats(pred, args.include_features)
+            pred = filter_feats(pred, args.include_features,
+                                args.remove_all_features)
 
             # Write reversed, unsquashed graph to file
             output.write(pred)
