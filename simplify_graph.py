@@ -99,27 +99,30 @@ def expand(graph):
     return graph
 
 
-def filter_feats(graph, features_to_keep=[]):
-    if not features_to_keep:
+def filter_feats(graph, features_to_keep=[], filter_all=False):
+    if not features_to_keep and not filter_all:
         return graph
-
-    inclusion_pattern = re.compile(
-        ':({})\ [\w+-]+'.format('|'.join(features_to_keep))
-    )
 
     all_nodes = list(get_all_nodes_pattern().finditer(graph))
     features = find_features(graph, all_nodes)
 
-    for feature in features:
+    if filter_all:
+        for feature in features:
+            graph = re.sub(re.escape(feature.strip()), ' ', graph)
+    else:
+        inclusion_pattern = re.compile(
+            ':({})\ [\w+-]+'.format('|'.join(features_to_keep))
+        )
 
-        # removes any of the features that we don't want to keep
-        cleaned_feat = ' '.join(feature[x.start(): x.end()] for x in
-                                inclusion_pattern.finditer(feature))
-        graph = re.sub(re.escape(feature.strip()), cleaned_feat, graph, count=1)
+        for feature in features:
+
+            # removes any of the features that we don't want to keep
+            cleaned_feat = ' '.join(feature[x.start(): x.end()] for x in
+                                    inclusion_pattern.finditer(feature))
+            graph = re.sub(re.escape(feature.strip()), cleaned_feat, graph, count=1)
 
     # Replaces '  ' with ' ' for consistency
-    graph = re.sub('  ', ' ', graph)
-
+    graph = re.sub(' +', ' ', graph)
     return graph
 
 
