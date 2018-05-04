@@ -108,7 +108,7 @@ def filter_feats(graph, features_to_keep=[], filter_all=False):
 
     if filter_all:
         for feature in features:
-            graph = re.sub(re.escape(feature.strip()), ' ', graph)
+            graph = re.sub(re.escape(feature.strip()), ' ', graph, count=1)
     else:
         inclusion_pattern = re.compile(
             ':({})\ [\w+-]+'.format('|'.join(features_to_keep))
