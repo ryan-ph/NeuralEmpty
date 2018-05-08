@@ -113,8 +113,8 @@ def get_predicates(graph):
     nodes = [matches[0][matches[0].rfind(' ') + 1:] for matches
              in all_nodes_pattern.findall(graph)]
 
-    return ([pred for pred in nodes if not pred.startswith('_')],
-            [pred for pred in nodes if pred.startswith('_')])
+    return ([pred for pred in nodes if pred.startswith('_')],
+            [pred for pred in nodes if not pred.startswith('_')])
 
 
 if __name__ == '__main__':
