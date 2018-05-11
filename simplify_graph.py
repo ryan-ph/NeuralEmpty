@@ -40,7 +40,8 @@ def check_parens(graph):
 
 
 def reverse(graph, instance_nodes):
-    if not check_parens(graph):
+    if (not check_parens(graph)                           # Invalid Paren structure
+        or not re.search('[/\t\+\w:=-](<\*>)?', graph)):  # Just parens or nothing
         return '(999999999 / invalid)\n'
 
     # Split nodes into argument and then node label and sorts so longest node
