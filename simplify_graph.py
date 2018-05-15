@@ -41,6 +41,7 @@ def check_parens(graph):
 
 def reverse(graph, instance_nodes):
     if (not check_parens(graph)                           # Invalid Paren structure
+        or not instance_nodes                             # Just features and no nodes
         or not re.search('[/\t\+\w:=-](<\*>)?', graph)):  # Just parens or nothing
         return '(999999999 / invalid)\n'
 

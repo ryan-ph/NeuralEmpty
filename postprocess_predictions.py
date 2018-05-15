@@ -4,7 +4,8 @@ import argparse
 from tqdm import tqdm
 from simplify_graph import get_all_nodes_pattern, \
                            get_instance_node_pattern, \
-                           expand, filter_feats, reverse
+                           expand, filter_feats, reverse, \
+                           check_parens
 
 
 def main():
@@ -43,6 +44,13 @@ def main():
             # Filtering features
             pred = filter_feats(pred, args.include_features,
                                 args.remove_all_features)
+
+            if not check_parens(pred):
+                pred = '(999999999 / invalid)\n'
+
+            # Handles predicted predicates after the end of the graph
+            last_paren = pred.rfind(')')
+            pred = pred[:last_paren + 1] + '\n'
 
             # Write reversed, unsquashed graph to file
             output.write(pred)
