@@ -22,7 +22,7 @@ for lang in "jp" "en"; do
                 grammar=$jacy
             fi
             full_path=$data/$dataset.$lang/$SUB
-            echo "python parser/mrs_to_penman.py --ace-binary $ace -g $grammar -i $full_path > $full_path/graphs"
+            python parser/mrs_to_penman.py --ace-binary $ace -g $grammar -i $full_path > $full_path/graphs
         done
     done
 done
