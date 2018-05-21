@@ -35,31 +35,8 @@ def map_parses(graphs):
 
             if feat.startswith('# ::id'):
                 id_map[feat] = parse
-
-            # skip sentence id and sentence as well as concrete args
-            if feat.startswith('#') or feat.startswith(':carg'):
-                continue
-
-            # separate opening paren from graph root
-            if feat.startswith('('):
-                feat = feat.replace('(', '( ')
-
-            # attach opening paren to node rather than label
-            elif '(' in feat:
-                feat = feat.replace(' (', '( ')
-
-            # splits a part closing brackets
-            if feat.endswith(')'):
-                feat = re.sub('\)', ' )', feat)
-
-            # remove lines that have lnk while preserving closing brackets
-            if feat.startswith(':lnk'):
-
-                # append closing brackets to previous feature
-                if feat.endswith(')'):
-                    paren_index = feat.find('>"')
-                    prev = parse.pop()
-                    parse.append(prev + feat[paren_index + 2:])
+            else:
+                parse.append(feat)
 
         # pop off space separating graphs
         if graph:
