@@ -31,11 +31,12 @@ def main():
     with open(args.output1, 'a') as lang1, \
         open(args.output2, 'a') as lang2:
         for key in common_keys:
-            eng_graph = ' '.join(eng_id[key])
-            jpn_graph = ' '.join(jpn_id[key])
-            lang1.write(eng_graph)
+            for line in eng_id[key]:
+                lang1.write(line)
             lang1.write('\n\n')
-            lang2.write(jpn_graph)
+
+            for line in jpn_id[key]:
+                lang2.write(line)
             lang2.write('\n\n')
 
 
