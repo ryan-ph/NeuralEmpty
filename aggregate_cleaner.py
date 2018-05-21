@@ -33,11 +33,13 @@ def main():
         for key in common_keys:
             for line in eng_id[key]:
                 lang1.write(line)
-            lang1.write('\n\n')
+                lang1.write('\n')
+            lang1.write('\n')
 
             for line in jpn_id[key]:
                 lang2.write(line)
-            lang2.write('\n\n')
+                lang2.write('\n')
+            lang2.write('\n')
 
 
 def map_parses(graphs):
