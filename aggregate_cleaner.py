@@ -25,6 +25,19 @@ def main():
         text = list(reversed(text.readlines()))
         jpn_id = map_parses(text)
 
+    # Set intersction between the graph IDs
+    common_keys = list(eng_id.keys() & jpn_id.keys())
+
+    with (open(args.output1, 'a') as lang1,
+        open(args.output2, 'a') as lang2):
+        for key in common_keys:
+            eng_graph = ' '.join(eng_id[key])
+            jpn_graph = ' '.join(jpn_id[key])
+            lang1.write(eng_graph)
+            lang1.write('\n')
+            lang2.write(jpn_graph)
+            lang2.write('\n')
+
 
 def map_parses(graphs):
     id_map = {}
