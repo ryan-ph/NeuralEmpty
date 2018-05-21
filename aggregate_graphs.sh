@@ -2,54 +2,41 @@
 
 
 # $1 - The output directory.
-# $2 - The title of the directories to check. For instance, 'train' will check
-#      'train.en/' and 'train.jp/'
+# $2 - The directory of the data. Should contain train.{en,jp}, dev.{en,jp}, test.{en,jp}
 # $3 - The subset of subdirectories to use. Uses all of them if left blank.
 
 out_dir=$1
-main_dir=$2
+data=$2
 sub_dirs=$3
 
 
-# Function that appends $1 (gzip file) to corresponding file in $2 (folder)
-append_gzip() {
-    file_name=${1##*/}
-    # echo $1
-    # echo $2/$file_name
-
-    # Appends gz file to the appropriate output file
-    zcat $1 | gzip -c >> $2/$file_name
-}
+if [ ! -d $data ]; then
+    echo "$data does not exist. Exiting."
+    exit 1
+fi
 
 
-# Iterates through all subdirectories of $main_dir and concatenates them to
-# corresponding output file.
-for lang in "en" "jp"; do
-    output_dir=$out_dir.$lang
-
-    # Creates the output directory if it does not exist
-    if [ ! -d $output_dir ]; then
-        mkdir $output_dir
-    fi
-
-    # Finds nested gz files to append
-    dir="$main_dir.$lang"
-    if [ -d $dir ]; then
+for dataset in "train" "dev" "test"; do
+    en_dir="$data$dataset.en"
+    jp_dir="$data$dataset.jp"
+    # Finds graphs in nested subdirectories
+    if [ -d $en_dir ]; then
         if [ -z ${3+x} ]; then
-            ls $dir/ | while read SUB; do
-                ls $dir/$SUB*/*.gz | while read F; do
-                    append_gzip $F $output_dir
-                done
+            ls $en_dir/ | while read SUB; do
+                if [[ -e $en_dir/$SUB/graph ]] && [[ -e $jp_dir/$SUB/graph ]]; then
+                    cat $en_dir/$SUB/graph >> $out_dir/$dataset.en
+                    cat $jp_dir/$SUB/graph >> $out_dir/$dataset.jp
+                fi
             done
         else
-            for dataset in $sub_dirs; do
-                ls $dir/$dataset*/*.gz | while read F; do
-                    append_gzip $F $output_dir
+            for sub_dir in $sub_dirs; do
+                ls $en_dir/$sub_dir* | while read SUB; do
+                    if [[ -e $en_dir/$SUB/graph ]] && [[ -e $jp_dir/$SUB/graph ]]; then
+                        cat $en_dir/$SUB/graph >> $out_dir/$dataset.en
+                        cat $jp_dir/$SUB/graph >> $out_dir/$dataset.jp
+                    fi
                 done
             done
         fi
-    else
-        echo "$dir does not exist. Exiting."
-        exit 1
     fi
 done
