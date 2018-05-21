@@ -25,16 +25,14 @@ for dataset in "train" "dev" "test"; do
         if [ -z ${3+x} ]; then
             ls $en_dir/ | while read SUB; do
                 if [[ -e $en_dir/$SUB/graphs ]] && [[ -e $jp_dir/$SUB/graphs ]]; then
-                    cat $en_dir/$SUB/graphs >> $out_dir/$dataset.en
-                    cat $jp_dir/$SUB/graphs >> $out_dir/$dataset.jp
+                    python aggregate_cleaner.py $en_dir/$SUB/graphs $jp_dir/$SUB/graphs $out_dir/$dataset.en $out_dir/$dataset.jp
                 fi
             done
         else
             for sub_dir in $sub_dirs; do
                 ls $en_dir/$sub_dir* | while read SUB; do
                     if [[ -e $en_dir/$SUB/graphs ]] && [[ -e $jp_dir/$SUB/graphs ]]; then
-                        cat $en_dir/$SUB/graphs >> $out_dir/$dataset.en
-                        cat $jp_dir/$SUB/graphs >> $out_dir/$dataset.jp
+                        python aggregate_cleaner.py $en_dir/$SUB/graphs $jp_dir/$SUB/graphs $out_dir/$dataset.en $out_dir/$dataset.jp
                     fi
                 done
             done
