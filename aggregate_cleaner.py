@@ -28,8 +28,8 @@ def main():
     # Set intersction between the graph IDs
     common_keys = list(eng_id.keys() & jpn_id.keys())
 
-    with (open(args.output1, 'a') as lang1,
-        open(args.output2, 'a') as lang2):
+    with open(args.output1, 'a') as lang1, \
+        open(args.output2, 'a') as lang2:
         for key in common_keys:
             eng_graph = ' '.join(eng_id[key])
             jpn_graph = ' '.join(jpn_id[key])
