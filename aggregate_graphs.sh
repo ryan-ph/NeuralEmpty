@@ -17,6 +17,8 @@ fi
 
 
 for dataset in "train" "dev" "test"; do
+    echo "aggregating $dataset"
+
     en_dir="$data$dataset.en"
     jp_dir="$data$dataset.jp"
 
@@ -30,7 +32,8 @@ for dataset in "train" "dev" "test"; do
             done
         else
             for sub_dir in $sub_dirs; do
-                ls $en_dir/$sub_dir* | while read SUB; do
+                find $en_dir/$sub_dir* -maxdepth 1 -type d | while read SUB; do
+                    SUB=${SUB##*/}
                     if [[ -e $en_dir/$SUB/graphs ]] && [[ -e $jp_dir/$SUB/graphs ]]; then
                         python aggregate_cleaner.py $en_dir/$SUB/graphs $jp_dir/$SUB/graphs $out_dir/$dataset.en $out_dir/$dataset.jp
                     fi
