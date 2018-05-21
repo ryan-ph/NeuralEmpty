@@ -48,8 +48,11 @@ def map_parses(graphs):
 
             if feat.startswith('# ::id'):
                 id_map[feat] = parse
+            elif feat.startswith('#'):
+                continue
             else:
                 parse.append(feat)
+        parse.append('\n')
 
         # pop off space separating graphs
         if graphs:
