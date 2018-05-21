@@ -19,21 +19,22 @@ fi
 for dataset in "train" "dev" "test"; do
     en_dir="$data$dataset.en"
     jp_dir="$data$dataset.jp"
+
     # Finds graphs in nested subdirectories
     if [ -d $en_dir ]; then
         if [ -z ${3+x} ]; then
             ls $en_dir/ | while read SUB; do
-                if [[ -e $en_dir/$SUB/graph ]] && [[ -e $jp_dir/$SUB/graph ]]; then
-                    cat $en_dir/$SUB/graph >> $out_dir/$dataset.en
-                    cat $jp_dir/$SUB/graph >> $out_dir/$dataset.jp
+                if [[ -e $en_dir/$SUB/graphs ]] && [[ -e $jp_dir/$SUB/graphs ]]; then
+                    cat $en_dir/$SUB/graphs >> $out_dir/$dataset.en
+                    cat $jp_dir/$SUB/graphs >> $out_dir/$dataset.jp
                 fi
             done
         else
             for sub_dir in $sub_dirs; do
                 ls $en_dir/$sub_dir* | while read SUB; do
-                    if [[ -e $en_dir/$SUB/graph ]] && [[ -e $jp_dir/$SUB/graph ]]; then
-                        cat $en_dir/$SUB/graph >> $out_dir/$dataset.en
-                        cat $jp_dir/$SUB/graph >> $out_dir/$dataset.jp
+                    if [[ -e $en_dir/$SUB/graphs ]] && [[ -e $jp_dir/$SUB/graphs ]]; then
+                        cat $en_dir/$SUB/graphs >> $out_dir/$dataset.en
+                        cat $jp_dir/$SUB/graphs >> $out_dir/$dataset.jp
                     fi
                 done
             done
