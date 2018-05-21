@@ -39,8 +39,8 @@ def map_parses(graphs):
                 parse.append(feat)
 
         # pop off space separating graphs
-        if graph:
-            graph.pop()
+        if graphs:
+            graphs.pop()
 
 
 if __name__ == '__main__':
