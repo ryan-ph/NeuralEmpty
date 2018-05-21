@@ -12,16 +12,24 @@ parser.add_argument('input_lang1', type=str,
 parser.add_argument('input_lang2', type=str,
                     help='File for original graphs in 2st language.')
 parser.add_argument('output', type=str,
-                    help='Output file for the cleaned data.')
+                    help='Output folder for the cleaned data. Filename will '
+                         'be the same as the inputs')
 parser.add_argument('--full', action='store_true',
                     help='Keeps all features of the DMRS graph. Defaults to '
                          'false.')
 args = parser.parse_args()
 
 
+last_slash = args.input_lang1.rfind('/')
+eng_file_name = args.input_lang1[last_slash + 1:]
+
+last_slash = args.input_lang2.rfind('/')
+jpn_file_name = args.input_lang2[last_slash + 1:]
+
 with open(args.input_lang1, 'r') as eng_text, \
      open(args.input_lang2, 'r') as jpn_text, \
-     open(args.output, 'w') as output:
+     open(args.output + eng_file_name, 'w') as eng_output, \
+     open(args.output + jpn_file_name, 'w') as jpn_output:
     eng_text = list(reversed(eng_text.readlines()))
     jpn_text = list(reversed(jpn_text.readlines()))
     while eng_text and jpn_text:
@@ -124,4 +132,5 @@ with open(args.input_lang1, 'r') as eng_text, \
         if len(eng_parse) > 1 and len(jpn_parse) > 1:
             eng_graph = ' '.join(eng_parse)
             jpn_graph = ' '.join(jpn_parse)
-            output.write(eng_graph + '\t' + jpn_graph + '\n')
+            eng_output.write(eng_graph + '\n')
+            jpn_output.write(jpn_graph + '\n')
