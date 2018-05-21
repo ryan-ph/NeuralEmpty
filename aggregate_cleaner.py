@@ -41,6 +41,7 @@ def map_parses(graphs):
         # pop off space separating graphs
         if graphs:
             graphs.pop()
+    return id_map
 
 
 if __name__ == '__main__':
