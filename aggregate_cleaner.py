@@ -18,11 +18,11 @@ def main():
     args = parser.parse_args()
 
     with open(args.input_lang1, 'r') as text:
-        text = list(reversed(eng_text.readlines()))
+        text = list(reversed(text.readlines()))
         eng_id = map_parses(text)
 
     with open(args.input_lang2, 'r') as text:
-        text = list(reversed(eng_text.readlines()))
+        text = list(reversed(text.readlines()))
         jpn_id = map_parses(text)
 
 
