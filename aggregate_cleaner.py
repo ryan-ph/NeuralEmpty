@@ -34,9 +34,9 @@ def main():
             eng_graph = ' '.join(eng_id[key])
             jpn_graph = ' '.join(jpn_id[key])
             lang1.write(eng_graph)
-            lang1.write('\n')
+            lang1.write('\n\n')
             lang2.write(jpn_graph)
-            lang2.write('\n')
+            lang2.write('\n\n')
 
 
 def map_parses(graphs):
@@ -52,7 +52,6 @@ def map_parses(graphs):
                 continue
             else:
                 parse.append(feat)
-        parse.append('\n')
 
         # pop off space separating graphs
         if graphs:
