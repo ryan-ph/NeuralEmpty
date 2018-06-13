@@ -246,6 +246,10 @@ def main():
             output.write('\t'.join(graphs))
 
 
+def get_invalid_node_pattern():
+    return re.compile(':[\w-]+\( :')
+
+
 def get_all_nodes_pattern():
     return re.compile('((:[\w-]*)?((\()|( <\*>)) [\w+]+( / [\w+]+)?)')
 

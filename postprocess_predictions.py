@@ -4,6 +4,7 @@ import argparse
 from tqdm import tqdm
 from simplify_graph import get_all_nodes_pattern, \
                            get_instance_node_pattern, \
+                           get_invalid_node_pattern, \
                            expand, filter_feats, reverse, \
                            check_parens
 
@@ -29,6 +30,7 @@ def main():
     # Reverse is true because model outputs simplified graphs
     instance_nodes_pattern = get_instance_node_pattern(reverse=True)
     all_nodes_pattern = get_all_nodes_pattern()
+    invalid_node_pattern = get_invalid_node_pattern()
 
     with open(args.output, 'w') as output:
         for i, pred in enumerate(tqdm(predictions)):
@@ -45,7 +47,8 @@ def main():
             pred = filter_feats(pred, args.include_features,
                                 args.remove_all_features)
 
-            if not check_parens(pred):
+            if (not check_parens(pred) or invalid_node_pattern.search(pred)
+                or '　' in pred):
                 pred = '(999999999 / invalid)\n'
 
             # Handles predicted predicates after the end of the graph
